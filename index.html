@@ -35,96 +35,59 @@
         }
     </style>
     <script>
-        async function fetchTotalDonations() {
-            const addresses = {
-                btc: "bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4",
-                eth: "0x52775287cc0B13d46416BC7953CD06010312C7e5",
-                ltc: "LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3",
-                sol: "GLdaanjj1MigwvaDZFjeFrbwqGSf74A3S4uEY1jzgHBa"
-            };
+ async function fetchDonations() {
+    const addresses = {
+        btc: "bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4",
+        eth: "0x52775287cc0B13d46416BC7953CD06010312C7e5",
+        ltc: "LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3"
+    };
 
-            let totalUSD = 0;
+    const apiKeys = {
+        eth: "6G7RJPK391QRX4K44ZRWXE8WTVG3G7JYDN",
+        ltc: "899b535d02764aca80f818202887a2fd"
+    };
 
-            try {
-                // Fetch BTC balance
-                let btcResponse = await fetch(`https://blockchain.info/q/addressbalance/${addresses.btc}?confirmations=1`);
-                let btcBalance = await btcResponse.text();
-                btcBalance = btcBalance / 100000000; // Convert to BTC
-                let btcPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd').then(res => res.json());
-                totalUSD += btcBalance * btcPrice.bitcoin.usd;
+    try {
+        const btcData = await fetch(`https://blockchain.info/q/addressbalance/${addresses.btc}?confirmations=1`).then(res => res.text());
+        const ethData = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${addresses.eth}&tag=latest&apikey=${apiKeys.eth}`).then(res => res.json());
+        const ltcData = await fetch(`https://api.blockcypher.com/v1/ltc/main/addrs/${addresses.ltc}/balance?token=${apiKeys.ltc}`).then(res => res.json());
 
-                // Fetch ETH balance
-                let ethResponse = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${addresses.eth}&tag=latest&apikey=6G7RJPK391QRX4K44ZRWXE8WTVG3G7JYDN`);
-                let ethData = await ethResponse.json();
-                let ethBalance = ethData.result / 1e18;
-                let ethPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd').then(res => res.json());
-                totalUSD += ethBalance * ethPrice.ethereum.usd;
+        let btcBalance = btcData / 100000000; // Convert Satoshis to BTC
+        let ethBalance = ethData.result / 1e18; // Convert Wei to ETH
+        let ltcBalance = ltcData.balance / 100000000; // Convert to LTC
 
-                // Fetch LTC balance
-                let ltcResponse = await fetch(`https://api.blockcypher.com/v1/ltc/main/addrs/${addresses.ltc}/balance?token=899b535d02764aca80f818202887a2fd`);
-                let ltcData = await ltcResponse.json();
-                let ltcBalance = ltcData.balance / 100000000;
-                let ltcPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=litecoin&vs_currencies=usd').then(res => res.json());
-                totalUSD += ltcBalance * ltcPrice.litecoin.usd;
+        let totalUSD = (btcBalance * 50000) + (ethBalance * 2500) + (ltcBalance * 70); // Rough conversion to USD
 
-                // Fetch SOL balance
-                let solResponse = await fetch("https://api.mainnet-beta.solana.com", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        jsonrpc: "2.0",
-                        id: 1,
-                        method: "getBalance",
-                        params: [addresses.sol]
-                    })
-                });
-                let solData = await solResponse.json();
-                let solBalance = solData.result.value / 1000000000;
-                let solPrice = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd').then(res => res.json());
-                totalUSD += solBalance * solPrice.solana.usd;
+        document.getElementById("total-donations").innerText = `$${totalUSD.toFixed(2)}`;
+    } catch (error) {
+        console.error("Error fetching balances:", error);
+        document.getElementById("total-donations").innerText = 'Unavailable';
+    }
+}
 
-                // Update total donations
-                document.getElementById("total-donations").innerText = `$${totalUSD.toFixed(2)} USD`;
-            } catch (error) {
-                console.error("Error fetching balances:", error);
-                document.getElementById("total-donations").innerText = "Unavailable";
-            }
-        }
-
-        // Refresh total donations every 30 seconds
-        setInterval(fetchTotalDonations, 30000);
-        fetchTotalDonations();
+setInterval(fetchDonations, 30000);
+fetchDonations();
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Donations for Lurkiee</h1>
         <p>Your support helps me continue my work. Thank you!</p>
-
         <div class="tracker">Total Donations: <span id="total-donations">Loading...</span></div>
 
         <div class="crypto">
             <h3>Bitcoin (BTC)</h3>
             <p>bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4" alt="BTC QR Code">
         </div>
 
         <div class="crypto">
             <h3>Ethereum (ETH)</h3>
             <p>0x52775287cc0B13d46416BC7953CD06010312C7e5</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x52775287cc0B13d46416BC7953CD06010312C7e5" alt="ETH QR Code">
         </div>
 
         <div class="crypto">
             <h3>Litecoin (LTC)</h3>
             <p>LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3" alt="LTC QR Code">
-        </div>
-
-        <div class="crypto">
-            <h3>Solana (SOL)</h3>
-            <p>GLdaanjj1MigwvaDZFjeFrbwqGSf74A3S4uEY1jzgHBa</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=GLdaanjj1MigwvaDZFjeFrbwqGSf74A3S4uEY1jzgHBa" alt="SOL QR Code">
         </div>
     </div>
 </body>
