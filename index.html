@@ -35,59 +35,72 @@
         }
     </style>
     <script>
- async function fetchDonations() {
-    const addresses = {
-        btc: "bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4",
-        eth: "0x52775287cc0B13d46416BC7953CD06010312C7e5",
-        ltc: "LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3"
-    };
+        async function fetchDonations() {
+            const addresses = {
+                btc: "bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4",
+                eth: "0x52775287cc0B13d46416BC7953CD06010312C7e5",
+                ltc: "LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3"
+            };
 
-    const apiKeys = {
-        eth: "6G7RJPK391QRX4K44ZRWXE8WTVG3G7JYDN",
-        ltc: "899b535d02764aca80f818202887a2fd"
-    };
+            const apiKeys = {
+                eth: "6G7RJPK391QRX4K44ZRWXE8WTVG3G7JYDN",
+                ltc: "899b535d02764aca80f818202887a2fd"
+            };
 
-    try {
-        const btcData = await fetch(`https://blockchain.info/q/addressbalance/${addresses.btc}?confirmations=1`).then(res => res.text());
-        const ethData = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${addresses.eth}&tag=latest&apikey=${apiKeys.eth}`).then(res => res.json());
-        const ltcData = await fetch(`https://api.blockcypher.com/v1/ltc/main/addrs/${addresses.ltc}/balance?token=${apiKeys.ltc}`).then(res => res.json());
+            try {
+                const btcData = await fetch(`https://blockchain.info/q/addressbalance/${addresses.btc}?confirmations=1`)
+                    .then(res => res.text());
+                const ethData = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${addresses.eth}&tag=latest&apikey=${apiKeys.eth}`)
+                    .then(res => res.json());
+                const ltcData = await fetch(`https://api.blockcypher.com/v1/ltc/main/addrs/${addresses.ltc}/balance?token=${apiKeys.ltc}`)
+                    .then(res => res.json());
 
-        let btcBalance = btcData / 100000000; // Convert Satoshis to BTC
-        let ethBalance = ethData.result / 1e18; // Convert Wei to ETH
-        let ltcBalance = ltcData.balance / 100000000; // Convert to LTC
+                const btcAmount = btcData / 100000000;
+                const ethAmount = ethData.result / 1e18;
+                const ltcAmount = ltcData.balance / 100000000;
 
-        let totalUSD = (btcBalance * 50000) + (ethBalance * 2500) + (ltcBalance * 70); // Rough conversion to USD
+                // Convert to USD (Example Rates, replace with real API if needed)
+                const btcToUsd = 45000;
+                const ethToUsd = 3000;
+                const ltcToUsd = 80;
 
-        document.getElementById("total-donations").innerText = `$${totalUSD.toFixed(2)}`;
-    } catch (error) {
-        console.error("Error fetching balances:", error);
-        document.getElementById("total-donations").innerText = 'Unavailable';
-    }
-}
+                const totalDonations = (btcAmount * btcToUsd) + (ethAmount * ethToUsd) + (ltcAmount * ltcToUsd);
 
-setInterval(fetchDonations, 30000);
-fetchDonations();
+                document.getElementById("total-donations").innerText = `$${totalDonations.toFixed(2)}`;
+
+            } catch (error) {
+                console.error("Error fetching balances:", error);
+                document.getElementById('total-donations').innerText = 'Unavailable';
+            }
+        }
+
+        setInterval(fetchDonations, 30000);
+        window.onload = fetchDonations;
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Donations for Lurkiee</h1>
         <p>Your support helps me continue my work. Thank you!</p>
+
         <div class="tracker">Total Donations: <span id="total-donations">Loading...</span></div>
 
         <div class="crypto">
             <h3>Bitcoin (BTC)</h3>
             <p>bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4" alt="BTC QR Code">
         </div>
 
         <div class="crypto">
             <h3>Ethereum (ETH)</h3>
             <p>0x52775287cc0B13d46416BC7953CD06010312C7e5</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x52775287cc0B13d46416BC7953CD06010312C7e5" alt="ETH QR Code">
         </div>
 
         <div class="crypto">
             <h3>Litecoin (LTC)</h3>
             <p>LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3" alt="LTC QR Code">
         </div>
     </div>
 </body>
