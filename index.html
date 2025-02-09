@@ -23,6 +23,12 @@
         }
         .crypto {
             margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .crypto p {
+            margin-right: 10px;
         }
         img {
             width: 150px;
@@ -32,6 +38,18 @@
             font-size: 1.2em;
             font-weight: bold;
             margin-top: 20px;
+        }
+        .copy-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #d63384;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .copy-btn:focus {
+            outline: none;
         }
     </style>
     <script>
@@ -76,6 +94,14 @@
 
         setInterval(fetchDonations, 120000); // Updates every 2 minutes instead of 30 sec
         window.onload = fetchDonations;
+
+        function copyToClipboard(address) {
+            navigator.clipboard.writeText(address).then(function() {
+                alert("Address copied to clipboard!");
+            }).catch(function(err) {
+                alert("Error copying address: ", err);
+            });
+        }
     </script>
 </head>
 <body>
@@ -88,22 +114,26 @@
         <div class="crypto">
             <h3>Bitcoin (BTC)</h3>
             <p>bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4</p>
+            <button class="copy-btn" onclick="copyToClipboard('bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4')">Copy</button>
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4" alt="BTC QR Code">
         </div>
 
         <div class="crypto">
             <h3>Ethereum (ETH)</h3>
             <p>0x52775287cc0B13d46416BC7953CD06010312C7e5</p>
+            <button class="copy-btn" onclick="copyToClipboard('0x52775287cc0B13d46416BC7953CD06010312C7e5')">Copy</button>
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x52775287cc0B13d46416BC7953CD06010312C7e5" alt="ETH QR Code">
         </div>
 
         <div class="crypto">
             <h3>Litecoin (LTC)</h3>
             <p>LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3</p>
+            <button class="copy-btn" onclick="copyToClipboard('LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3')">Copy</button>
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3" alt="LTC QR Code">
-     <br> Your donations mean the world to me <3 </br>
-If you ever decide to donate, DM me on discord, so I can thank you privately and might even put some stuff in there ;)
         </div>
+
+        <br> Your donations mean the world to me <3 </br>
+        <p>If you ever decide to donate, DM me on discord, so I can thank you privately and might even put some stuff in there ;)</p>
     </div>
 
 </body>
