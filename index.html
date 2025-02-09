@@ -6,40 +6,64 @@
     <title>Donations for Lurkiee</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-        
+
         body {
             font-family: 'Pacifico', cursive;
             text-align: center;
             background: url('https://source.unsplash.com/1600x900/?aesthetic,pink') no-repeat center center/cover;
             color: #d63384;
         }
+
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 50px auto;
             background: rgba(255, 230, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #d63384;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            border-radius: 5px;
+        }
+
+        .tab-button.active {
+            background-color: #b02263;
+        }
+
         .crypto {
             margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
+
         .crypto p {
             margin: 10px 0;
         }
+
         img {
             width: 150px;
             height: 150px;
             margin-top: 10px;
         }
+
         .tracker {
             font-size: 1.2em;
             font-weight: bold;
             margin-top: 20px;
         }
+
         .copy-btn {
             padding: 5px 10px;
             background-color: #d63384;
@@ -50,11 +74,48 @@
             font-size: 1rem;
             margin-top: 10px;
         }
+
         .copy-btn:focus {
             outline: none;
         }
+
+        .leaderboard-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #d63384;
+        }
+
+        .leaderboard-table th {
+            background-color: #f8c7e7;
+        }
+
+        .crypto-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
     <script>
+        // Function to change between tabs
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            // Hide all tabs and remove 'active' from buttons
+            tabs.forEach(tab => tab.style.display = 'none');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Show the clicked tab and highlight the button
+            document.getElementById(tabId).style.display = 'block';
+            document.querySelector(`button[data-tab="${tabId}"]`).classList.add('active');
+        }
+
         async function fetchDonations() {
             const addresses = {
                 btc: "bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4",
@@ -104,39 +165,95 @@
                 alert("Error copying address: ", err);
             });
         }
+
+        // Sample leaderboard data
+        const leaderboardData = [
+            { rank: 1, name: "Alice", donation: 1000 },
+            { rank: 2, name: "Bob", donation: 750 },
+            { rank: 3, name: "Charlie", donation: 500 },
+            { rank: 4, name: "Dave", donation: 250 }
+        ];
+
+        // Function to display the leaderboard
+        function displayLeaderboard() {
+            const tableBody = document.getElementById('leaderboard-body');
+            tableBody.innerHTML = '';  // Clear existing rows
+
+            leaderboardData.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.rank}</td>
+                    <td>${entry.name}</td>
+                    <td>$${entry.donation}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>Donations for Lurkiee</h1>
-        <p>Your support helps me continue my work. Thank you!</p>
-
-        <div class="tracker">Total Donations: <span id="total-donations">Loading...</span></div>
-
-        <div class="crypto">
-            <h3>Bitcoin (BTC)</h3>
-            <p>bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4</p>
-            <button class="copy-btn" onclick="copyToClipboard('bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4')">Copy</button>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4" alt="BTC QR Code">
+        <!-- Navigation tabs -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="donations" onclick="showTab('donations')">Donations & Addresses</button>
+            <button class="tab-button" data-tab="leaderboard" onclick="showTab('leaderboard')">Leaderboard</button>
         </div>
 
-        <div class="crypto">
-            <h3>Ethereum (ETH)</h3>
-            <p>0x52775287cc0B13d46416BC7953CD06010312C7e5</p>
-            <button class="copy-btn" onclick="copyToClipboard('0x52775287cc0B13d46416BC7953CD06010312C7e5')">Copy</button>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x52775287cc0B13d46416BC7953CD06010312C7e5" alt="ETH QR Code">
+        <!-- Donations & Addresses Tab -->
+        <div class="tab-content" id="donations">
+            <h1>Donations for Lurkiee</h1>
+            <p>Your support helps me continue my work. Thank you!</p>
+
+            <div class="tracker">Total Donations: <span id="total-donations">Loading...</span></div>
+
+            <div class="crypto">
+                <h3>Bitcoin (BTC)</h3>
+                <p>bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4</p>
+                <button class="copy-btn" onclick="copyToClipboard('bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4')">Copy</button>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bc1q2ph5zwmmdqp274qnkjm6a4med6dc4gh0fxenl4" alt="BTC QR Code">
+            </div>
+
+            <div class="crypto">
+                <h3>Ethereum (ETH)</h3>
+                <p>0x52775287cc0B13d46416BC7953CD06010312C7e5</p>
+                <button class="copy-btn" onclick="copyToClipboard('0x52775287cc0B13d46416BC7953CD06010312C7e5')">Copy</button>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=0x52775287cc0B13d46416BC7953CD06010312C7e5" alt="ETH QR Code">
+            </div>
+
+            <div class="crypto">
+                <h3>Litecoin (LTC)</h3>
+                <p>LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3</p>
+                <button class="copy-btn" onclick="copyToClipboard('LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3')">Copy</button>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3" alt="LTC QR Code">
+            </div>
         </div>
 
-        <div class="crypto">
-            <h3>Litecoin (LTC)</h3>
-            <p>LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3</p>
-            <button class="copy-btn" onclick="copyToClipboard('LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3')">Copy</button>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=LgPfjRWymhJ8xiTSkwcwVHb8Aq4txvNQs3" alt="LTC QR Code">
+        <!-- Leaderboard Tab -->
+        <div class="tab-content" id="leaderboard" style="display:none;">
+            <h1>Top Donators</h1>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Donation ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Leaderboard data will be injected here -->
+                </tbody>
+            </table>
         </div>
 
-        <br> Your donations mean the world to me <3 </br>
-        <p>If you ever decide to donate, DM me on discord, so I can thank you privately and might even put some stuff in there ;)</p>
     </div>
+
+    <script>
+        // Display leaderboard data when the Leaderboard tab is shown
+        if (document.querySelector('.tab-button.active').getAttribute('data-tab') === 'leaderboard') {
+            displayLeaderboard();
+        }
+    </script>
 
 </body>
 </html>
